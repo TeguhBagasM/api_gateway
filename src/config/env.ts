@@ -3,7 +3,7 @@ import { z } from "zod";
 
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-  PORT: z.coerce.number().default(5000),
+  PORT: z.coerce.number().int().positive("PORT wajib diisi (angka positif)"),
   CORS_ORIGIN: z.string().min(1, "CORS_ORIGIN wajib diisi"),
   RBAC_SERVICE_URL: z.string().min(1, "RBAC_SERVICE_URL wajib diisi"),
   MASTER_SERVICE_URL: z.string().default(""),
@@ -21,6 +21,7 @@ const parsed = envSchema.safeParse(process.env);
 if (!parsed.success) {
   console.error("==========================================");
   console.error("FAILED TO START: validasi environment variable gagal.");
+  console.error("Wajib diisi di file .env: PORT, CORS_ORIGIN, RBAC_SERVICE_URL.");
   for (const issue of parsed.error.issues) {
     console.error(`  - [${issue.path.join(".")}] ${issue.message}`);
   }

@@ -3,7 +3,7 @@ import type { Application, Request, Response } from "express";
 import type { ClientRequest, IncomingMessage, ServerResponse } from "node:http";
 import { Socket } from "node:net";
 import { env } from "../config/env.js";
-import { serviceTargets } from "../config/services.js";
+import { serviceTargets, type ServiceTarget } from "../config/services.js";
 
 const INTERNAL_HEADERS = [
   "x-request-id",
@@ -45,16 +45,20 @@ function prepareProxyRequest(proxyReq: ClientRequest, req: IncomingMessage) {
   proxyReq.setHeader("x-request-id", (req as Request).id);
 }
 
+function toInternalPath(service: ServiceTarget): string {
+  return service.prefix.replace(/^\/api/, `/${service.name}`);
+}
+
 export function setupProxyRoutes(app: Application) {
   for (const service of serviceTargets) {
     app.use(
       service.prefix,
       createProxyMiddleware({
-        target: service.baseUrl,
+        target: service.target,
         changeOrigin: true,
         timeout: env.PROXY_TIMEOUT_MS,
         proxyTimeout: env.PROXY_TIMEOUT_MS,
-        pathRewrite: (path) => `${service.prefix}${path}`,
+        pathRewrite: (path) => `${toInternalPath(service)}${path}`,
         on: {
           error: handleProxyError,
           proxyReq: prepareProxyRequest,

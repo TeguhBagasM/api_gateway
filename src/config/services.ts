@@ -1,18 +1,15 @@
-import { env } from "./env.js";
-
 export interface ServiceTarget {
   name: string;
-  baseUrl: string;
   prefix: string;
+  target: string;
 }
 
-function buildServiceTargets(): ServiceTarget[] {
-  const targets: ServiceTarget[] = [];
-  if (env.RBAC_SERVICE_URL) targets.push({ name: "rbac", baseUrl: env.RBAC_SERVICE_URL, prefix: "/rbac" });
-  if (env.MASTER_SERVICE_URL) targets.push({ name: "master", baseUrl: env.MASTER_SERVICE_URL, prefix: "/master" });
-  if (env.DOKUMEN_SERVICE_URL) targets.push({ name: "dokumen", baseUrl: env.DOKUMEN_SERVICE_URL, prefix: "/dokumen" });
-  if (env.TRANSAKSI_SERVICE_URL) targets.push({ name: "transaksi", baseUrl: env.TRANSAKSI_SERVICE_URL, prefix: "/transaksi" });
-  return targets;
-}
-
-export const serviceTargets = buildServiceTargets();
+export const serviceTargets: ServiceTarget[] = [
+  { name: "rbac", prefix: "/api/auth", target: process.env.RBAC_SERVICE_URL! },
+  { name: "rbac", prefix: "/api/users", target: process.env.RBAC_SERVICE_URL! },
+  { name: "rbac", prefix: "/api/roles", target: process.env.RBAC_SERVICE_URL! },
+  { name: "rbac", prefix: "/api/menus", target: process.env.RBAC_SERVICE_URL! },
+  // TODO: tambahkan service-data-master di sini
+  // TODO: tambahkan service-dokumen di sini
+  // TODO: tambahkan service-transaksi di sini
+];
