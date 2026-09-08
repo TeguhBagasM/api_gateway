@@ -1,30 +1,36 @@
 {
   "name": "api-gateaway",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Thin reverse proxy gateway untuk microservices beasiswa",
+  "main": "dist/index.js",
   "scripts": {
+    "dev": "nodemon --exec tsx src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
     "http-proxy-middleware": "^4.2.0",
-    "jsonwebtoken": "^9.0.3"
+    "morgan": "^1.12.0",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
-    "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
     "@types/node": "^26.5.0",
     "nodemon": "^3.1.14",
     "ts-node": "^10.9.2",
-    "typescript": "^7.0.2"
+    "tsx": "^4.23.13",
+    "typescript": "^5.9.3"
   }
 }
