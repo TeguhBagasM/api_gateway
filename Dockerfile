@@ -18,6 +18,7 @@ RUN npm ci
 
 # Salin tsconfig + source, lalu build TypeScript ke ./dist.
 COPY tsconfig.json ./
+COPY src ./src
 RUN npm run build
 
 # ---------- RUNNER (production) ----------
