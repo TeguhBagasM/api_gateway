@@ -11,8 +11,8 @@ const envSchema = z.object({
   TRANSAKSI_SERVICE_URL: z.string().default(""),
   RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60000),
   RATE_LIMIT_MAX: z.coerce.number().int().positive().default(100),
-  AUTH_RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60000),
-  AUTH_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(20),
+  AUTH_RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(900000), // 15 menit
+  AUTH_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(10),
   PROXY_TIMEOUT_MS: z.coerce.number().int().positive().default(10000),
 });
 

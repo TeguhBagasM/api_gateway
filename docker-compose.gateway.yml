@@ -1,0 +1,73 @@
+# =============================================================================
+# docker-compose KHUSUS API GATEWAY (opsi "compose terpisah dari service-rbac")
+#
+# Dipakai kalau file compose gateway ini TERPISAH dari file compose yang
+# menjalankan service-rbac. Keduanya harus berbagi network internal yang sama.
+#
+# Cara berbagi network antar compose file yang berbeda (repo benar-benar
+# terpisah / file compose berbeda):
+#   1. Buat network sekali saja (mutually-exclusive dengan langkah 2):
+#        docker network create beasiswa-internal-net
+#   2. ATAU kalau service-rbac dijalankan lewat docker-compose.yml root repo ini,
+#      network-nya sudah dibuat otomatis oleh compose root — cukup pastikan
+#      compose root berjalan dulu.
+#   3. SEMUA compose file (service-rbac, gateway, dll) men-declare network yang
+#      sama sebagai "external: true" (lihat bagian `networks` di bawah).
+#   4. Jalankan masing-masing compose file. Semua container yang attach ke
+#      network yang sama bisa saling resolve nama service lewat embedded DNS
+#      Docker (mis. `service-rbac`), TANPA publish port satu sama lain.
+#
+# PRASYARAT: network `beasiswa-internal-net` HARUS sudah ada sebelum
+# `docker compose up` file ini dijalankan.
+# =============================================================================
+
+services:
+  api-gateway:
+    build:
+      context: . # context = direktori api-gateaway ini
+    env_file:
+      - .env # var non-kritis (rate limit, timeouts, dsb.)
+    environment:
+      NODE_ENV: production
+      # Port app DI DALAM container — harus konsisten dengan ports "8080:8080"
+      # di bawah. app.listen(env.PORT) membaca nilai ini.
+      PORT: "8080"
+
+      # ===== KENAPA BUKAN localhost? =====
+      # "localhost" di dalam sebuah container menunjuk ke container ITU
+      # SENDIRI. Gateway dan service-rbac adalah dua host yang berbeda, jadi
+      # localhost dari sisi gateway TIDAK PERNAH sampai ke service-rbac.
+      # Yang harus dipakai adalah NAMA SERVICE Docker-nya, yang di-resolve oleh
+      # embedded DNS Docker selama keduanya di network yang sama.
+      RBAC_SERVICE_URL: "http://service-rbac:4001"
+      # Port 4001 = port LISTENER service-rbac DI DALAM network (bukan host).
+      # Host-port 4001 yang di-publish saat development TIDAK relevan di sini
+      # — komunikasi antar container memakai port internal, bukan host port.
+
+      # Service lain (nanti) — sama, ikut nama service Docker-nya, bukan localhost:
+      # MASTER_SERVICE_URL: "http://service-master:5002"
+      # DOKUMEN_SERVICE_URL: "http://service-dokumen:5003"
+      # TRANSAKSI_SERVICE_URL: "http://service-transaksi:5004"
+
+    ports:
+      # ===== SATU-SATUNYA service yang boleh publish port ke host =====
+      # API Gateway adalah GERBANG masuk tunggal. Di production HANYA service
+      # ini yang boleh mengekspos port ke luar (host). service-rbac dan service
+      # lain TIDAK BOLEH punya baris "ports" — mereka hidup di internal network
+      # dan hanya bisa diakses lewat gateway.
+      - "8080:8080"
+
+    networks:
+      - beasiswa-internal-net
+
+    # Catatan: TIDAK ada depends_on service-rbac di sini karena service-rbac
+    # ada di compose file/project terpisah — Compose tidak bisa menunggu service
+    # dari file lain. Kalau gateway start duluan, /health/detailed akan
+    # melaporkan rbac "down" sampai service-rbac aktif, lalu normal kembali.
+
+networks:
+  # Network internal BERSAMA yang sudah ada di luar compose file ini
+  # (dibuat oleh compose service-rbac/root, atau manual via
+  # `docker network create beasiswa-internal-net`).
+  beasiswa-internal-net:
+    external: true

@@ -1,0 +1,21 @@
+# Dependency & hasil build TIDAK boleh masuk ke build context.
+# (tanpa ini, Docker akan mengirim node_modules + dist ke daemon → build lambat
+# dan .env bisa bocor ke image layer)
+node_modules
+dist
+
+# Berkas lokal / rahasia
+.env
+.env.*
+!.env.example
+*.log
+
+# Git & tooling
+.git
+.gitignore
+
+# File compose gateway ini bukan bagian dari image
+docker-compose.gateway.yml
+
+# Dockerfiles tidak perlu jadi bagian build context
+Dockerfile
