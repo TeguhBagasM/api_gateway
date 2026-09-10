@@ -1,5 +1,5 @@
 {
-  "name": "api-gateaway",
+  "name": "api-gateway",
   "version": "1.0.0",
   "description": "Thin reverse proxy gateway untuk microservices beasiswa",
   "main": "dist/index.js",

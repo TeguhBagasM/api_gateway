@@ -24,7 +24,7 @@
 services:
   api-gateway:
     build:
-      context: . # context = direktori api-gateaway ini
+      context: . # context = direktori api-gateway ini
     env_file:
       - .env # var non-kritis (rate limit, timeouts, dsb.)
     environment:
