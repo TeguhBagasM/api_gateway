@@ -75,12 +75,25 @@ function prepareProxyRequest(proxyReq: ClientRequest, req: IncomingMessage) {
   proxyReq.setHeader("x-request-id", (req as Request).id);
 }
 
-// Konversi prefix gateway (/api/auth) ke path internal service (/auth).
-// Gateway menerima request di /api/auth/login,
-// tapi service RBAC mendengarkan /auth/login —
-// jadi pathRewrite harus menghapus prefix /api.
+// Konversi prefix gateway (/api/auth) ke path internal service (/rbac/auth).
+// Gateway menerima request di /api/auth/login, pathRewrite mengubahnya menjadi
+// /rbac/auth/login — prefix didedupe per segment path.
+//
+// Sebelumnya pathRewrite = prefix.replace(/^\/api/, "/" + nama service).
+// Formula itu menghasilkan path ganda untuk service-data-master:
+//   /api/master → "/master" + "/master" = /master/master (SALAH)
+// Semua service dipasang di /api/<sub-path>, lalu pathRewrite menempel
+// "/" + nama service di depannya. Untuk RBAC sub-path-nya auth/users/roles/menus
+// (≠ "rbac"), jadi hasilnya benar: /rbac/auth. Tapi sub-path master LITERAL
+// "master" — sama dengan nama service — sehingga segment "master" ganda.
+//
+// Dedupe segment pertama yang sama dengan nama service memperbaiki ini:
+//   /api/auth   → segment ["auth"]  → /rbac/auth   (segment ≠ "rbac", dipertahankan)
+//   /api/master → segment ["master"] → /master      (segment == "master", dibuang)
 function toInternalPath(service: ServiceTarget): string {
-  return service.prefix.replace(/^\/api/, `/${service.name}`);
+  const segments = service.prefix.slice("/api".length).split("/").filter(Boolean);
+  const subPaths = segments.filter((segment) => segment !== service.name);
+  return ["", service.name, ...subPaths].join("/");
 }
 
 /**

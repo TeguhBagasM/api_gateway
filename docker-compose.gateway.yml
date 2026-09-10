@@ -39,9 +39,9 @@ services:
       # localhost dari sisi gateway TIDAK PERNAH sampai ke service-rbac.
       # Yang harus dipakai adalah NAMA SERVICE Docker-nya, yang di-resolve oleh
       # embedded DNS Docker selama keduanya di network yang sama.
-      RBAC_SERVICE_URL: "http://service-rbac:4001"
-      # Port 4001 = port LISTENER service-rbac DI DALAM network (bukan host).
-      # Host-port 4001 yang di-publish saat development TIDAK relevan di sini
+      RBAC_SERVICE_URL: "http://service-rbac:5001"
+      # Port 5001 = port LISTENER service-rbac DI DALAM network (bukan host).
+      # Host-port 5001 yang di-publish saat development TIDAK relevan di sini
       # — komunikasi antar container memakai port internal, bukan host port.
 
       # Service lain (nanti) — sama, ikut nama service Docker-nya, bukan localhost:
