@@ -10,6 +10,6 @@ export const serviceTargets: ServiceTarget[] = [
   { name: "rbac", prefix: "/api/roles", target: process.env.RBAC_SERVICE_URL! },
   { name: "rbac", prefix: "/api/menus", target: process.env.RBAC_SERVICE_URL! },
   { name: "master", prefix: "/api/master", target: process.env.MASTER_SERVICE_URL! },
-  // TODO: tambahkan service-dokumen di sini
-  // TODO: tambahkan service-transaksi di sini
+  { name: "dokumen", prefix: "/api/dokumen", target: process.env.DOKUMEN_SERVICE_URL! },
+  { name: "transaksi", prefix: "/api/transaksi", target: process.env.TRANSAKSI_SERVICE_URL! },
 ];
